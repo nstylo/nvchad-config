@@ -2,23 +2,57 @@
 require("nvchad.configs.lspconfig").defaults()
 
 local lspconfig = require "lspconfig"
-
--- EXAMPLE
-local servers = { "html", "cssls" }
 local nvlsp = require "nvchad.configs.lspconfig"
 
+local servers = {
+  html = {},
+  cssls = {},
+  clangd = {},
+  pyright = {},
+  volar = {},
+  tsserver = {
+    init_options = {
+      preferences = {
+        includeInlayParameterNameHints = "all",
+        includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayVariableTypeHints = true,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayEnumMemberValueHints = true,
+        importModuleSpecifierPreference = "non-relative",
+      },
+    },
+  },
+  yamlls = {},
+  dockerls = {},
+  gopls = {},
+  rust_analyzer = {
+    settings = {
+      ["rust-analyzer"] = {
+        checkOnSave = {
+          command = "clippy",
+        },
+      },
+    },
+  },
+  solidity_ls = {},
+  graphql = {},
+  svelte = {},
+  bashls = {},
+}
+
 -- lsps with default config
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
-    on_attach = nvlsp.on_attach,
-    on_init = nvlsp.on_init,
-    capabilities = nvlsp.capabilities,
-  }
+for name, opts in pairs(servers) do
+  opts.on_attach = nvlsp.on_attach
+  opts.on_init = nvlsp.on_init
+  opts.capabilities = nvlsp.capabilities
+
+  lspconfig[name].setup(opts)
 end
 
--- configuring single server, example: typescript
--- lspconfig.tsserver.setup {
---   on_attach = nvlsp.on_attach,
---   on_init = nvlsp.on_init,
---   capabilities = nvlsp.capabilities,
--- }
+vim.cmd [[ do User LspAttachBuffers ]]
+
+vim.diagnostic.config {
+  virtual_text = false,
+}
